@@ -83,6 +83,7 @@ export type ListWidget<Key, Item = Key> = BaseListWidget & {
     ) => void;
     sort: (sorting_function: string, prop?: string) => void;
     replace_list_data: (list: Key[], should_redraw?: boolean) => void;
+    clear_text_filter: (search: JQuery) => void;
 };
 
 const DEFAULTS = {
@@ -577,6 +578,14 @@ export function create<Key, Item = Key>(
             */
             meta.list = list;
             if (should_redraw) {
+                widget.hard_redraw();
+            }
+        },
+
+        clear_text_filter(search) {
+            if (search.val() !== "") {
+                search.val("");
+                widget.set_filter_value("");
                 widget.hard_redraw();
             }
         },
