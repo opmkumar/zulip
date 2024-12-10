@@ -8,7 +8,12 @@
     <div class="settings_panel_list_header">
         <h3>{{t "Invitations "}}</h3>
         <div class="alert-notification" id="invites-field-status"></div>
-        <input type="text" class="search filter_text_input" placeholder="{{t 'Filter invitations' }}" aria-label="{{t 'Filter invitations' }}"/>
+        <div class="search_container">
+            <input type="text" class="search filter_text_input" placeholder="{{t 'Filter invitations' }}" aria-label="{{t 'Filter invitations' }}"/>
+            <button type="button" class="clear_filter">
+                <i class="zulip-icon zulip-icon-close"></i>
+            </button>
+        </div>
     </div>
 
     <div class="progressive-table-wrapper" data-simplebar data-simplebar-tab-index="-1">
