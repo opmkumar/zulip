@@ -8,7 +8,12 @@
         <div class="alert-notification" id="deactivated-user-field-status"></div>
         <div class="user_filters">
             {{> ../dropdown_widget widget_name=deactivated_user_list_dropdown_widget_name}}
-            <input type="text" class="search filter_text_input" placeholder="{{t 'Filter deactivated users' }}" aria-label="{{t 'Filter deactivated users' }}"/>
+            <div class="search_container">
+                <input type="text" class="search filter_text_input" placeholder="{{t 'Filter deactivated users' }}" aria-label="{{t 'Filter deactivated users' }}"/>
+                <button type="button" class="clear_filter">
+                    <i class="zulip-icon zulip-icon-close"></i>
+                </button>
+            </div>
         </div>
     </div>
 
