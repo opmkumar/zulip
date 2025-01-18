@@ -240,6 +240,11 @@ class ClientDescriptor:
             # delivered if the stream_typing_notifications
             # client_capability is enabled, for backwards compatibility.
             return self.stream_typing_notifications
+        if event["type"] == "typing_edit_message" and "stream_id" in event:
+            # Typing message edit notifications for stream messages are only
+            # delivered if the stream_typing_notifications
+            # client_capability is enabled, for backwards compatibility.
+            return self.stream_typing_notifications
         if self.user_settings_object and event["type"] in [
             "update_display_settings",
             "update_global_notifications",

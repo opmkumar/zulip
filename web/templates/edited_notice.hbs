@@ -1,14 +1,17 @@
+<div id="editing_notifications" class="edit_notifications {{#unless is_typing}}hide{{/unless}}">
+    {{> editing_notifications}}
+</div>
 {{#if modified}}
     {{#if msg/local_edit_timestamp}}
-        <div class="message_edit_notice">
+        <div class="message_edit_notice {{#if is_typing}}hide{{/if}}">
             {{t "SAVING"}}
         </div>
     {{else if moved}}
-        <div class="message_edit_notice">
+        <div class="message_edit_notice {{#if is_typing}}hide{{/if}}">
             {{t "MOVED"}}
         </div>
     {{else}}
-        <div class="message_edit_notice">
+        <div class="message_edit_notice {{#if is_typing}}hide{{/if}}">
             {{t "EDITED"}}
         </div>
     {{/if}}

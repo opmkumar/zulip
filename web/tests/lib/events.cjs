@@ -187,6 +187,22 @@ exports.fixtures = {
         type: "invites_changed",
     },
 
+    message_edit_typing__start: {
+        type: "typing_edit_message",
+        op: "start",
+        message_type: "direct",
+        sender: typing_person1,
+        message_id: 128,
+    },
+
+    message_edit_typing__stop: {
+        type: "typing_edit_message",
+        op: "stop",
+        message_type: "direct",
+        sender: typing_person1,
+        message_id: 128,
+    },
+
     muted_users: {
         type: "muted_users",
         muted_users: [
@@ -717,6 +733,24 @@ exports.fixtures = {
         sender: typing_person1,
         stream_id: this.stream_typing_in_id,
         topic: this.topic_typing_in,
+    },
+
+    stream_typing_edit_message__start: {
+        type: "typing_edit_message",
+        op: "start",
+        message_type: "stream",
+        sender: typing_person1,
+        stream_id: this.stream_typing_in_id,
+        message_id: 128,
+    },
+
+    stream_typing_edit_message__stop: {
+        type: "typing_edit_message",
+        op: "stop",
+        message_type: "stream",
+        sender: typing_person1,
+        stream_id: this.stream_typing_in_id,
+        message_id: 128,
     },
 
     submessage: {

@@ -954,6 +954,34 @@ class EventTypingStop(EventTypingStopCore):
     topic: str | None = None
 
 
+class EventTypingEditMessageStartCore(BaseModel):
+    type: Literal["typing_edit_message"]
+    op: Literal["start"]
+    message_type: Literal["direct", "stream"]
+    sender: TypingPerson
+    message_id: int
+    id: int
+
+
+class EventTypingEditMessageStart(EventTypingEditMessageStartCore):
+    # TODO: fix types to avoid optional fields
+    stream_id: int | None = None
+
+
+class EventTypingEditMessageStopCore(BaseModel):
+    type: Literal["typing_edit_message"]
+    op: Literal["stop"]
+    message_type: Literal["direct", "stream"]
+    sender: TypingPerson
+    message_id: int
+    id: int
+
+
+class EventTypingEditMessageStop(EventTypingEditMessageStopCore):
+    # TODO: fix types to avoid optional fields
+    stream_id: int | None = None
+
+
 class EventUpdateDisplaySettingsCore(BaseModel):
     type: Literal["update_display_settings"]
     setting_name: str

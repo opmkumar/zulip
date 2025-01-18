@@ -4,13 +4,21 @@ from django.http import HttpRequest, HttpResponse
 from django.utils.translation import gettext as _
 from pydantic import Json
 
-from zerver.actions.typing import check_send_typing_notification, do_send_stream_typing_notification
+from zerver.actions.message_edit import validate_user_can_edit_message
+from zerver.actions.typing import (
+    check_send_typing_notification,
+    do_send_direct_message_edit_typing_notification,
+    do_send_stream_message_edit_typing_notification,
+    do_send_stream_typing_notification,
+)
 from zerver.lib.exceptions import JsonableError
+from zerver.lib.message import access_message
 from zerver.lib.response import json_success
 from zerver.lib.streams import access_stream_by_id_for_message, access_stream_for_send_message
 from zerver.lib.topic import maybe_rename_general_chat_to_empty_topic
 from zerver.lib.typed_endpoint import ApiParamConfig, OptionalTopic, typed_endpoint
-from zerver.models import UserProfile
+from zerver.models import Recipient, UserProfile
+from zerver.models.recipients import get_direct_message_group_user_ids
 
 
 @typed_endpoint
@@ -60,5 +68,42 @@ def send_notification_backend(
             raise JsonableError(_("User has disabled typing notifications for direct messages"))
 
         check_send_typing_notification(user_profile, user_ids, operator)
+
+    return json_success(request)
+
+
+@typed_endpoint
+def send_message_edit_notification_backend(
+    request: HttpRequest,
+    user_profile: UserProfile,
+    *,
+    operator: Annotated[Literal["start", "stop"], ApiParamConfig("op")],
+    message_id: Json[int],
+) -> HttpResponse:
+    message = access_message(user_profile, message_id)
+    validate_user_can_edit_message(user_profile, message, 0)
+    recipient = message.recipient
+
+    if recipient.type == Recipient.STREAM:
+        if not user_profile.send_stream_typing_notifications:
+            raise JsonableError(_("User has disabled typing notifications for stream messages"))
+
+        stream_id = recipient.type_id
+        do_send_stream_message_edit_typing_notification(
+            user_profile, stream_id, message_id, operator
+        )
+
+    else:
+        if not user_profile.send_private_typing_notifications:
+            raise JsonableError(_("User has disabled typing notifications for direct messages"))
+
+        if recipient.type == Recipient.PERSONAL:
+            recipient_ids = [user_profile.id, recipient.type_id]
+        else:
+            recipient_ids = list(get_direct_message_group_user_ids(recipient))
+
+        do_send_direct_message_edit_typing_notification(
+            user_profile, recipient_ids, message_id, operator
+        )
 
     return json_success(request)

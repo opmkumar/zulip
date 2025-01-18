@@ -93,6 +93,7 @@
 * [Get all alert words](/api/get-alert-words)
 * [Add alert words](/api/add-alert-words)
 * [Remove alert words](/api/remove-alert-words)
+* [Set "typing" status for message editing](/api/set-typing-status-for-message-edit)
 
 #### Invitations
 

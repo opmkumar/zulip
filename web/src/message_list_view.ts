@@ -42,6 +42,7 @@ import * as submessage from "./submessage.ts";
 import {is_same_day} from "./time_zone_util.ts";
 import * as timerender from "./timerender.ts";
 import type {TopicLink} from "./types.ts";
+import * as typing_data from "./typing_data.ts";
 import * as user_topics from "./user_topics.ts";
 import type {AllVisibilityPolicies} from "./user_topics.ts";
 import * as util from "./util.ts";
@@ -662,6 +663,7 @@ export class MessageListView {
         sender_is_guest: boolean;
         should_add_guest_indicator_for_sender: boolean;
         is_hidden: boolean;
+        is_typing: boolean;
         mention_classname: string | undefined;
         include_sender: boolean;
         status_message: string | false;
@@ -669,6 +671,7 @@ export class MessageListView {
         moved: boolean;
         modified: boolean;
     } {
+        const is_typing = typing_data.is_message_editing(message.id);
         /*
             If the message needs to be hidden because the sender was muted, we do
             a few things:
@@ -751,6 +754,7 @@ export class MessageListView {
             sender_is_guest,
             should_add_guest_indicator_for_sender,
             is_hidden,
+            is_typing,
             mention_classname,
             include_sender,
             ...this._maybe_get_me_message(is_hidden, message),

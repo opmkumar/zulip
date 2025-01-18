@@ -104,7 +104,12 @@ from zerver.actions.streams import (
     do_rename_stream,
 )
 from zerver.actions.submessage import do_add_submessage
-from zerver.actions.typing import check_send_typing_notification, do_send_stream_typing_notification
+from zerver.actions.typing import (
+    check_send_typing_notification,
+    do_send_direct_message_edit_typing_notification,
+    do_send_stream_message_edit_typing_notification,
+    do_send_stream_typing_notification,
+)
 from zerver.actions.user_groups import (
     add_subgroups_to_user_group,
     bulk_add_members_to_user_groups,
@@ -188,6 +193,8 @@ from zerver.lib.event_schema import (
     check_subscription_peer_remove,
     check_subscription_remove,
     check_subscription_update,
+    check_typing_edit_message_start,
+    check_typing_edit_message_stop,
     check_typing_start,
     check_typing_stop,
     check_update_display_settings,
@@ -1409,6 +1416,57 @@ class NormalActionsTest(BaseAction):
                 "stop",
                 stream,
                 topic_name,
+            )
+        self.assertEqual(events, [])
+
+    def test_edit_message_typing_events(self) -> None:
+        msg_id = self.send_personal_message(self.user_profile, self.example_user("cordelia"))
+
+        with self.verify_action(state_change_expected=False) as events:
+            do_send_direct_message_edit_typing_notification(
+                self.user_profile, [self.example_user("cordelia").id], msg_id, "start"
+            )
+        check_typing_edit_message_start("events[0]", events[0])
+
+        with self.verify_action(state_change_expected=False) as events:
+            do_send_direct_message_edit_typing_notification(
+                self.user_profile, [self.example_user("cordelia").id], msg_id, "stop"
+            )
+        check_typing_edit_message_stop("events[0]", events[0])
+
+    def test_stream_edit_message_typing_events(self) -> None:
+        stream = get_stream("Denmark", self.user_profile.realm)
+        msg_id = self.send_stream_message(
+            self.user_profile, stream.name, topic_name="editing", content="before edit"
+        )
+
+        with self.verify_action(state_change_expected=False) as events:
+            do_send_stream_message_edit_typing_notification(
+                self.user_profile, stream.id, msg_id, "start"
+            )
+        check_typing_edit_message_start("events[0]", events[0])
+
+        with self.verify_action(state_change_expected=False) as events:
+            do_send_stream_message_edit_typing_notification(
+                self.user_profile, stream.id, msg_id, "stop"
+            )
+        check_typing_edit_message_stop("events[0]", events[0])
+
+        # Having client_capability `stream_typing_notification=False`
+        # shouldn't produce any events.
+        with self.verify_action(
+            state_change_expected=False, stream_typing_notifications=False, num_events=0
+        ) as events:
+            do_send_stream_message_edit_typing_notification(
+                self.user_profile, stream.id, msg_id, "start"
+            )
+        self.assertEqual(events, [])
+
+        with self.verify_action(
+            state_change_expected=False, stream_typing_notifications=False, num_events=0
+        ) as events:
+            do_send_stream_message_edit_typing_notification(
+                self.user_profile, stream.id, msg_id, "stop"
             )
         self.assertEqual(events, [])
 
